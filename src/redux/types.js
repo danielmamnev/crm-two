@@ -1,0 +1,4 @@
+export const GET_CUSTOMERS = 'GET_CUSTOMERS';
+export const FILTER_CUSTOMER = 'FILTER_CUSTOMER';
+export const CLEAR_FILTER = 'CLEAR_FILTER';
+export const CUSTOMER_ERROR = 'CUSTOMER_ERROR';

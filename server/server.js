@@ -46,7 +46,7 @@ app.post('/new', async (req, res) => {
 app.get('/customers', function (req, res) {
   pool.query('SELECT * FROM customer', function (err, data) {
     console.log(err, data);
-    res.json({ customers: data });
+    res.json({ customers: data.rows });
 
   });
 });

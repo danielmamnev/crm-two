@@ -4,10 +4,14 @@ import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
 import SearchCustomer from './SearchCustomer';
+import { getCustomers } from '../redux/customerActions';
+import { connect } from 'react-redux';
 
-function CustomerList() {
-  const [error, setError] = useState(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+function CustomerList({ customers, filtered, dispatch }) {
+  useEffect(() => {
+    dispatch(getCustomers);
+  }, []);
+
   const [viewCust, setViewCust] = useState(false);
   const [whichCust, setWhichCust] = useState({
     id: '',
@@ -23,22 +27,6 @@ function CustomerList() {
     stateaddress: '',
     zip: '',
   });
-  const [customers, setCustomers] = useState([]);
-
-  useEffect(() => {
-    fetch('http://localhost:3001/customers')
-      .then((response) => response.json())
-      .then(
-        (results) => {
-          setIsLoaded(true);
-          setCustomers(results.customers.rows);
-        },
-        (error) => {
-          setIsLoaded(true);
-          setError(error);
-        }
-      );
-  }, []);
 
   const ViewCustHandler = (e) => {
     setWhichCust({ id: e.target.value });
@@ -48,23 +36,27 @@ function CustomerList() {
       .then((response) => response.json())
       .then(
         (results) => {
-          setIsLoaded(true);
           setViewingCust(results.customer.rows[0]);
         },
         (error) => {
-          setIsLoaded(true);
-          setError(error);
+          console.log(error);
         }
       );
   };
 
   return (
     <div>
-
       <div className="container">
         <div className="row">
           <div className="col-md-6">
-      <SearchCustomer />
+            <SearchCustomer />
+            {filtered !== undefined ? (
+              filtered.map((fcustomer) => (
+                <p key={fcustomer.id}>{fcustomer.firstname}</p>
+              ))
+            ) : (
+              <p></p>
+            )}
             {customers.map((customer) => (
               <Card key={customer.id}>
                 <Card.Header>
@@ -247,4 +239,8 @@ function CustomerList() {
   );
 }
 
-export default CustomerList;
+const mapStateToProps = (state) => ({
+  customers: state.customer.customers,
+});
+
+export default connect(mapStateToProps)(CustomerList);
