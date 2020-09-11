@@ -28,7 +28,7 @@ const text = useRef("")
       <InputGroup className="mb-3">
         <InputGroup.Prepend>
           <InputGroup.Text id="basic-addon1">
-            <img src="https://img.icons8.com/android/24/000000/search.png" />
+            <img alt="searchIcon" src="https://img.icons8.com/android/24/000000/search.png" />
           </InputGroup.Text>
         </InputGroup.Prepend>
         <FormControl

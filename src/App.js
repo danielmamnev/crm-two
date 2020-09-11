@@ -1,9 +1,9 @@
 import React from 'react';
 import './App.css';
 import Header from './components/Header';
-import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch} from 'react-router-dom';
 import CustomerList from './components/CustomerList';
-import EditCustomer from './components/EditCustomer';
+import CreateCustomer from './components/CreateCustomer';
 import { Provider } from 'react-redux';
 import store from './redux/store';
 
@@ -15,7 +15,7 @@ function App() {
           <Header />
           <Switch>
             <Route exact path="/" component={CustomerList} />
-            <Route path="/edit" component={EditCustomer} />
+            <Route path="/edit" component={CreateCustomer} />
           </Switch>
         </Provider>
       </div>

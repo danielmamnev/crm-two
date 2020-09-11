@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
@@ -15,9 +14,7 @@ function CustomerList({ customers, filtered, dispatch }) {
   }, []);
 
   const [viewCust, setViewCust] = useState(false);
-  const [whichCust, setWhichCust] = useState({
-    id: '',
-  });
+ 
   const [viewingCust, setViewingCust] = useState({
     firstname: '',
     lastname: '',
@@ -31,7 +28,7 @@ function CustomerList({ customers, filtered, dispatch }) {
   });
 
   const ViewCustHandler = (e) => {
-    setWhichCust({ id: e.target.value });
+  
     setViewCust(true);
 
     fetch(`http://localhost:3001/customer/${e.target.value}`)
@@ -63,7 +60,7 @@ function CustomerList({ customers, filtered, dispatch }) {
       }
     );
     const json = await response.json();
-    toast.success('Customer Updated! Refresh the page for updates', {});
+    toast.success('Customer Updated!', {});
     console.log(json);
     dispatch(getCustomers);
   };
@@ -81,7 +78,7 @@ function CustomerList({ customers, filtered, dispatch }) {
       }
     );
     const json = await response.json();
-    toast.dark('Deleted! Refresh to Show Update', {});
+    toast.dark('Deleted!', {});
     console.log(json);
     setViewCust(false);
   };

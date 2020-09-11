@@ -1,3 +1,16 @@
+
+Please scroll to the bottom for dependency installations.
+
+
+
+
+git clone: git@github.com:danielmamnev/crm-two.git
+
+`npm install`
+
+
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
@@ -66,3 +79,47 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/de
 ### `npm run build` fails to minify
 
 This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+
+
+In your server/backend directory - install the following.
+
+
+Express installation
+
+`npm i express`
+
+
+CORS Installation 
+
+`npm i cors`
+
+For this project - I used PostgreSQL, you are able to easily use MySQL as well. 
+
+`npm install pg`
+
+Include this at the top your server configuration.
+
+`const express = require('express');
+const app = express();
+const cors = require('cors');
+
+app.use(cors());
+app.use(express.json());`
+
+
+
+
+Install the following dependencies for your client side in the root folder.
+
+dotenv for environment variables.
+
+`npm i dotenv`
+
+Bootstrap for styling components. If you do not use bootstrap you will need to rewrite the component to JSX/HTML with classNames. 
+
+`npm i react-bootstrap`
+
+Routing and Manipulating the DOM
+
+`npm i react-router-dom`
+
