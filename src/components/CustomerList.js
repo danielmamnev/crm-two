@@ -6,6 +6,8 @@ import Form from 'react-bootstrap/Form';
 import SearchCustomer from './SearchCustomer';
 import { getCustomers } from '../redux/customerActions';
 import { connect } from 'react-redux';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function CustomerList({ customers, filtered, dispatch }) {
   useEffect(() => {
@@ -44,44 +46,100 @@ function CustomerList({ customers, filtered, dispatch }) {
       );
   };
 
+  const onChange = (e) =>
+    setViewingCust({ ...viewingCust, [e.target.name]: e.target.value });
+
+  const editButtonHandler = async (e) => {
+    e.preventDefault();
+
+    const response = await fetch(
+      `http://localhost:3001/edit/${viewingCust.id}`,
+      {
+        method: 'PUT',
+        headers: new Headers({
+          'Content-Type': 'application/json',
+        }),
+        body: JSON.stringify(viewingCust),
+      }
+    );
+    const json = await response.json();
+    toast.success('Customer Updated! Refresh the page for updates', {});
+    console.log(json);
+    dispatch(getCustomers);
+  };
+
+  const deleteHandler = async (e) => {
+    e.preventDefault();
+    const response = await fetch(
+      `http://localhost:3001/delete/${viewingCust.id}`,
+      {
+        method: 'DELETE',
+        headers: new Headers({
+          'Content-Type': 'application/json',
+        }),
+        body: JSON.stringify(viewingCust),
+      }
+    );
+    const json = await response.json();
+    toast.dark('Deleted! Refresh to Show Update', {});
+    console.log(json);
+    setViewCust(false);
+  };
+
   return (
     <div>
+      <ToastContainer />
       <div className="container">
         <div className="row">
           <div className="col-md-6">
             <SearchCustomer />
-            {filtered !== undefined ? (
-              filtered.map((fcustomer) => (
-                <p key={fcustomer.id}>{fcustomer.firstname}</p>
-              ))
-            ) : (
-              <p></p>
-            )}
-            {customers.map((customer) => (
-              <Card key={customer.id}>
-                <Card.Header>
-                  {customer.firstname} {customer.lastname}
-                </Card.Header>
-                <Card.Body>
-                  {customer.phone} | {customer.email}
-                  <br></br>
-                  <Button
-                    variant="outline-primary"
-                    size="sm"
-                    onClick={ViewCustHandler}
-                    value={customer.id}
-                  >
-                    View
-                  </Button>
-                </Card.Body>
-              </Card>
-            ))}
+            {filtered.length !== 0
+              ? filtered.map((fcustomer) => (
+                  <Card key={fcustomer.id}>
+                    <Card.Header>
+                      {fcustomer.firstname} {fcustomer.lastname}
+                    </Card.Header>
+                    <Card.Body>
+                      {fcustomer.phone} | {fcustomer.email}
+                      <br></br>
+                      <Button
+                        variant="outline-primary"
+                        size="sm"
+                        onClick={ViewCustHandler}
+                        value={fcustomer.id}
+                      >
+                        View
+                      </Button>
+                    </Card.Body>
+                  </Card>
+                ))
+              : customers.map((customer) => (
+                  <Card key={customer.id}>
+                    <Card.Header>
+                      {customer.firstname} {customer.lastname}
+                    </Card.Header>
+                    <Card.Body>
+                      <div className="row">
+                        <div className="col-md-4">{customer.phone}</div>{' '}
+                        <div className="col-md-6">{customer.email}</div>
+                        <br></br>
+                        <Button
+                          variant="outline-primary"
+                          onClick={ViewCustHandler}
+                          value={customer.id}
+                        >
+                          View
+                        </Button>
+                      </div>
+                    </Card.Body>
+                  </Card>
+                ))}
           </div>
 
           {!viewCust ? (
             <p></p>
           ) : (
-            <div className="col-md-6">
+            <div className="col-md-6 pt-3">
               <Card>
                 <Card.Header>
                   {viewingCust.firstname} {viewingCust.lastname}
@@ -93,7 +151,8 @@ function CustomerList({ customers, filtered, dispatch }) {
                       <Form.Control
                         className="text-center"
                         name="firstname"
-                        value={viewingCust.firstname}
+                        defaultValue={viewingCust.firstname}
+                        onChange={onChange}
                       />
                     </Form.Group>
                     <Form.Group controlId="lastName">
@@ -103,7 +162,8 @@ function CustomerList({ customers, filtered, dispatch }) {
                         type="name"
                         name="lastname"
                         className="text-center"
-                        value={viewingCust.lastname}
+                        defaultValue={viewingCust.lastname}
+                        onChange={onChange}
                       />
                     </Form.Group>
                     <Form.Group controlId="lastName">
@@ -112,7 +172,8 @@ function CustomerList({ customers, filtered, dispatch }) {
                         type="phone"
                         name="phone"
                         className="text-center"
-                        value={viewingCust.phone}
+                        defaultValue={viewingCust.phone}
+                        onChange={onChange}
                       />
                     </Form.Group>
                     <Form.Group controlId="email">
@@ -121,7 +182,8 @@ function CustomerList({ customers, filtered, dispatch }) {
                         type="email"
                         className="text-center"
                         name="email"
-                        value={viewingCust.email}
+                        defaultValue={viewingCust.email}
+                        onChange={onChange}
                       />
                     </Form.Group>
 
@@ -131,7 +193,8 @@ function CustomerList({ customers, filtered, dispatch }) {
                         type="text"
                         className="text-center"
                         name="addressone"
-                        value={viewingCust.addressone}
+                        defaultValue={viewingCust.addressone}
+                        onChange={onChange}
                       />
                     </Form.Group>
                     <Form.Group controlId="exampleForm.ControlInput1">
@@ -140,7 +203,8 @@ function CustomerList({ customers, filtered, dispatch }) {
                         type="text"
                         className="text-center"
                         name="addresstwo"
-                        value={viewingCust.addresstwo}
+                        defaultValue={viewingCust.addresstwo}
+                        onChange={onChange}
                       />
                     </Form.Group>
                     <Form.Group controlId="exampleForm.ControlInput1">
@@ -149,7 +213,8 @@ function CustomerList({ customers, filtered, dispatch }) {
                         type="text"
                         className="text-center"
                         name="city"
-                        value={viewingCust.city}
+                        defaultValue={viewingCust.city}
+                        onChange={onChange}
                       />
                     </Form.Group>
                     <Form.Group controlId="exampleForm.ControlSelect2">
@@ -157,7 +222,8 @@ function CustomerList({ customers, filtered, dispatch }) {
                       <Form.Control
                         as="select"
                         name="stateaddress"
-                        value={viewingCust.stateaddress}
+                        defaultValue={viewingCust.stateaddress}
+                        onChange={onChange}
                         className="text-center"
                         multiple
                       >
@@ -221,12 +287,25 @@ function CustomerList({ customers, filtered, dispatch }) {
                         type="number"
                         className="text-center"
                         name="zip"
-                        value={viewingCust.zip}
+                        defaultValue={viewingCust.zip}
+                        onChange={onChange}
                       />
                     </Form.Group>
 
-                    <Button variant="success" type="submit">
-                      edit
+                    <Button
+                      variant="success"
+                      type="submit"
+                      onClick={editButtonHandler}
+                      className="mr-3"
+                    >
+                      Submit Changes
+                    </Button>
+                    <Button
+                      variant="danger"
+                      type="submit"
+                      onClick={deleteHandler}
+                    >
+                      Delete
                     </Button>
                   </Form>
                 </Card.Body>
@@ -241,6 +320,7 @@ function CustomerList({ customers, filtered, dispatch }) {
 
 const mapStateToProps = (state) => ({
   customers: state.customer.customers,
+  filtered: state.customer.filtered,
 });
 
 export default connect(mapStateToProps)(CustomerList);

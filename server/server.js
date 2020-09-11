@@ -22,19 +22,30 @@ const pool = new Pool({
 module.exports = pool;
 
 app.post('/new', async (req, res) => {
+  const {
+    firstname,
+    lastname,
+    phone,
+    email,
+    addressone,
+    addresstwo,
+    city,
+    stateaddress,
+    zip,
+  } = req.body;
   try {
     const newCustomer = await pool.query(
       'INSERT INTO customer (firstname, lastname, phone, email, addressone, addresstwo, city, stateaddress, zip) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
       [
-        req.body.firstname,
-        req.body.lastname,
-        req.body.phone,
-        req.body.email,
-        req.body.addressone,
-        req.body.addresstwo,
-        req.body.city,
-        req.body.stateaddress,
-        req.body.zip,
+        firstname,
+        lastname,
+        phone,
+        email,
+        addressone,
+        addresstwo,
+        city,
+        stateaddress,
+        zip,
       ]
     );
     res.json(newCustomer);
@@ -47,16 +58,47 @@ app.get('/customers', function (req, res) {
   pool.query('SELECT * FROM customer', function (err, data) {
     console.log(err, data);
     res.json({ customers: data.rows });
-
   });
 });
 
 app.get('/customer/:id', function (req, res) {
-var id = req.params.id;
-  pool.query('SELECT * FROM customer WHERE id = $1', [id], function (err, data) {
+  var id = req.params.id;
+  pool.query('SELECT * FROM customer WHERE id = $1', [id], function (
+    err,
+    data
+  ) {
     console.log(err, data);
     res.json({ customer: data });
+  });
+});
 
+app.put('/edit/:id', function (req, res) {
+  var id = req.body.id;
+  var psql = `UPDATE customer SET firstname = $1, lastname = $2, phone = $3, email = $4, addressone = $5, addresstwo = $6, city = $7, stateaddress = $8, zip = $9 WHERE id = $10`;
+  var values = [
+    req.body.firstname,
+    req.body.lastname,
+    req.body.phone,
+    req.body.email,
+    req.body.addressone,
+    req.body.addresstwo,
+    req.body.city,
+    req.body.stateaddress,
+    req.body.zip,
+    id,
+  ];
+  pool.query(psql, values, function (err, data) {
+    console.log(err, data);
+    res.json({ message: 'Succesful Update!' });
+  });
+});
+
+app.delete('/delete/:id', (req, res) => {
+  var id = req.body.id;
+  var psql = `DELETE FROM customer WHERE id = ${id}`;
+  pool.query(psql, function (err, data) {
+    console.log(err, data);
+    res.json({ message: 'Succesfully Deleted!' });
   });
 });
 

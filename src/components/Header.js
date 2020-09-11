@@ -11,6 +11,11 @@ function Header() {
       CRM
     </Navbar.Text>
 </Navbar.Collapse>
+<Navbar.Collapse className="justify-content-end pr-3">
+    <Navbar.Text >
+      It's Jitesh's way - or the wrong way
+    </Navbar.Text>
+</Navbar.Collapse>
 
   <Navbar.Text className="justify-content-end">
        <a href="/edit">

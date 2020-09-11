@@ -36,6 +36,7 @@ const text = useRef("")
           type="text"
           placeholder="Search By Name"
           onChange={onChange}
+
         />
       </InputGroup>
     </div>

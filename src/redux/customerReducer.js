@@ -7,8 +7,8 @@ import {
 
 const initialState = {
   customers: [],
-  current: null,
-  filtered: null,
+  current: [],
+  filtered: [],
 };
 
 export default (state = initialState, action) => {
@@ -23,16 +23,16 @@ export default (state = initialState, action) => {
       return {
         ...state,
         filtered: state.customers.filter((customer) => {
-          const regex = new RegExp(`${action.payload}`, "gi");
+          const regex = new RegExp(`${action.payload}`, 'gi');
           return (
             customer.firstname.match(regex) || customer.lastname.match(regex)
-);
+          );
         }),
       };
     case CLEAR_FILTER:
       return {
         ...state,
-        filtered: null,
+        filtered: [],
       };
     case CUSTOMER_ERROR:
       return {
@@ -42,4 +42,4 @@ export default (state = initialState, action) => {
     default:
       return state;
   }
-}
+};
