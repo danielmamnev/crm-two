@@ -66,6 +66,18 @@ const offset = req.params.offset;
   });
 });
 
+// Get all customers for length
+app.get('/customers/all', function (req, res) {
+
+
+  // const resultCustomers = customers.slice(startIndex, endIndex)
+
+  pool.query('SELECT * FROM customer ', function (err, data) {
+    console.log(err, data);
+  res.json({ customers: data.rows });
+  });
+});
+
 app.get('/customer/:id', function (req, res) {
   var id = req.params.id;
   pool.query('SELECT * FROM customer WHERE id = $1', [id], function (

@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { filterCustomers, clearFilter } from '../redux/customerActions';
 
 
+
 function SearchCustomer({ filterCustomers, clearFilter, filtered }) {
 
 const text = useRef("")

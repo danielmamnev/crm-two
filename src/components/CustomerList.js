@@ -3,25 +3,43 @@ import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
 import SearchCustomer from './SearchCustomer';
-import { getCustomers } from '../redux/customerActions';
+import { getCustomers, getAll } from '../redux/customerActions';
 import { connect } from 'react-redux';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Accordion from 'react-bootstrap/Accordion';
 import InfiniteScroll from 'react-infinite-scroll-component';
-
+import '../App.css';
+import logo from '../giphy.gif'
 function CustomerList({ customers, filtered, dispatch }) {
   const limit = 6;
   const [offset, setOffset] = useState(0);
-
+  const [totalCustomers, setTotalCustomers] = useState(100);
+  const [hasMore, setHasMore] = useState(true);
   useEffect(() => {
     dispatch((dispatch) => getCustomers(dispatch, limit, offset));
   }, [offset]);
 
+  useEffect(() => {
+    dispatch((dispatch) => getAll(dispatch));
+  }, [offset]);
+
   const nextPageHandler = (e) => {
     setOffset(offset + limit);
+    fetch(`http://localhost:3001/customers/all`)
+      .then((response) => response.json())
+      .then(
+        (results) => {
+          setTotalCustomers(results.customers.length);
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+    if (totalCustomers < offset + limit) {
+      setHasMore(false);
+    }
   };
-  console.log('nexthandler', offset);
 
   const [viewCust, setViewCust] = useState(false);
 
@@ -36,7 +54,7 @@ function CustomerList({ customers, filtered, dispatch }) {
     stateaddress: '',
     zip: '',
   });
-
+  const scrollContainerStyle = { maxHeight: '500px' };
   const ViewCustHandler = (e) => {
     setViewingCust('');
     setViewCust(true);
@@ -71,8 +89,8 @@ function CustomerList({ customers, filtered, dispatch }) {
     );
     const json = await response.json();
     toast.success('Customer Updated!', {});
-    console.log(json);
-    dispatch(getCustomers);
+
+    // dispatch((dispatch) => getCustomers(dispatch, limit, offset));
   };
 
   const deleteHandler = async (e) => {
@@ -103,54 +121,60 @@ function CustomerList({ customers, filtered, dispatch }) {
         <div className="row">
           <div className="col-md-6">
             <SearchCustomer />
-            <InfiniteScroll
-              dataLength={customers.length}
-              next={nextPageHandler}
-              hasMore={true}
-              loader={<h4>Loading...</h4>}
+            <div
+              className="scrollbar scrollbar-primary mx-auto rounded mb-4 border border-primary" id="scrollableDiv"
+              style={scrollContainerStyle}
             >
-              {filtered.length !== 0
-                ? filtered.map((fcustomer) => (
-                    <Card key={fcustomer.id}>
-                      <Card.Header>
-                        {fcustomer.firstname} {fcustomer.lastname}
-                      </Card.Header>
-                      <Card.Body>
-                        {fcustomer.phone} | {fcustomer.email}
-                        <br></br>
-                        <Button
-                          variant="outline-primary"
-                          size="sm"
-                          onClick={ViewCustHandler}
-                          value={fcustomer.id}
-                        >
-                          View
-                        </Button>
-                      </Card.Body>
-                    </Card>
-                  ))
-                : customers.map((customer) => (
-                    <Card key={customer.id}>
-                      <Card.Header>
-                        {customer.firstname} {customer.lastname}
-                      </Card.Header>
-                      <Card.Body>
-                        <div className="row">
-                          <div className="col-md-4">{customer.phone}</div>{' '}
-                          <div className="col-md-6">{customer.email}</div>
+              <InfiniteScroll
+                dataLength={customers.length}
+                next={nextPageHandler}
+                hasMore={hasMore}
+                loader={<img src={logo} width="120px" height="90px"alt="loading"/>}
+                scrollableTarget="scrollableDiv"
+              >
+                {filtered.length !== 0
+                  ? filtered.map((fcustomer) => (
+                      <Card key={fcustomer.id}>
+                        <Card.Header>
+                          {fcustomer.firstname} {fcustomer.lastname}
+                        </Card.Header>
+                        <Card.Body>
+                          {fcustomer.phone} | {fcustomer.email}
                           <br></br>
                           <Button
                             variant="outline-primary"
+                            size="sm"
                             onClick={ViewCustHandler}
-                            value={customer.id}
+                            value={fcustomer.id}
                           >
                             View
                           </Button>
-                        </div>
-                      </Card.Body>
-                    </Card>
-                  ))}
-            </InfiniteScroll>
+                        </Card.Body>
+                      </Card>
+                    ))
+                  : customers.map((customer) => (
+                      <Card key={customer.id}>
+                        <Card.Header>
+                          {customer.firstname} {customer.lastname}
+                        </Card.Header>
+                        <Card.Body>
+                          <div className="row">
+                            <div className="col-md-4">{customer.phone}</div>{' '}
+                            <div className="col-md-6">{customer.email}</div>
+                            <br></br>
+                            <Button
+                              variant="outline-primary"
+                              onClick={ViewCustHandler}
+                              value={customer.id}
+                            >
+                              View
+                            </Button>
+                          </div>
+                        </Card.Body>
+                      </Card>
+                    ))}
+              </InfiniteScroll>
+            </div>
           </div>
 
           {!viewCust ? (
