@@ -54,10 +54,15 @@ app.post('/new', async (req, res) => {
   }
 });
 
-app.get('/customers', function (req, res) {
-  pool.query('SELECT * FROM customer', function (err, data) {
+app.get('/customers/:offset/:limit', function (req, res) {
+  const limit = req.params.limit;
+const offset = req.params.offset;
+
+  // const resultCustomers = customers.slice(startIndex, endIndex)
+
+  pool.query('SELECT * FROM customer ORDER BY id OFFSET $1 LIMIT $2', [offset, limit], function (err, data) {
     console.log(err, data);
-    res.json({ customers: data.rows });
+  res.json({ customers: data.rows });
   });
 });
 

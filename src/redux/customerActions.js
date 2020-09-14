@@ -5,8 +5,9 @@ import {
 } from './types';
 
 
-export async function getCustomers(dispatch) {
-  const response = await fetch(`http://localhost:3001/customers`);
+export async function getCustomers(dispatch, limit, offset) {
+console.log('limit', limit, 'offset', offset)
+  const response = await fetch(`http://localhost:3001/customers/${offset}/${limit}`);
   const json = await response.json();
   dispatch({ type: GET_CUSTOMERS, payload: json.customers });
 }

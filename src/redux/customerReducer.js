@@ -16,7 +16,7 @@ export default (state = initialState, action) => {
     case GET_CUSTOMERS:
       return {
         ...state,
-        customers: action.payload,
+        customers: [...state.customers , ...action.payload],
       };
 
     case FILTER_CUSTOMER:

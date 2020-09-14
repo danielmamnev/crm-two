@@ -7,14 +7,24 @@ import { getCustomers } from '../redux/customerActions';
 import { connect } from 'react-redux';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Accordion from 'react-bootstrap/Accordion';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 function CustomerList({ customers, filtered, dispatch }) {
+  const limit = 6;
+  const [offset, setOffset] = useState(0);
+
   useEffect(() => {
-    dispatch(getCustomers);
-  }, []);
+    dispatch((dispatch) => getCustomers(dispatch, limit, offset));
+  }, [offset]);
+
+  const nextPageHandler = (e) => {
+    setOffset(offset + limit);
+  };
+  console.log('nexthandler', offset);
 
   const [viewCust, setViewCust] = useState(false);
- 
+
   const [viewingCust, setViewingCust] = useState({
     firstname: '',
     lastname: '',
@@ -28,7 +38,7 @@ function CustomerList({ customers, filtered, dispatch }) {
   });
 
   const ViewCustHandler = (e) => {
-  
+    setViewingCust('');
     setViewCust(true);
 
     fetch(`http://localhost:3001/customer/${e.target.value}`)
@@ -82,6 +92,9 @@ function CustomerList({ customers, filtered, dispatch }) {
     console.log(json);
     setViewCust(false);
   };
+  const hideHandler = (e) => {
+    setViewCust(false);
+  };
 
   return (
     <div>
@@ -90,47 +103,54 @@ function CustomerList({ customers, filtered, dispatch }) {
         <div className="row">
           <div className="col-md-6">
             <SearchCustomer />
-            {filtered.length !== 0
-              ? filtered.map((fcustomer) => (
-                  <Card key={fcustomer.id}>
-                    <Card.Header>
-                      {fcustomer.firstname} {fcustomer.lastname}
-                    </Card.Header>
-                    <Card.Body>
-                      {fcustomer.phone} | {fcustomer.email}
-                      <br></br>
-                      <Button
-                        variant="outline-primary"
-                        size="sm"
-                        onClick={ViewCustHandler}
-                        value={fcustomer.id}
-                      >
-                        View
-                      </Button>
-                    </Card.Body>
-                  </Card>
-                ))
-              : customers.map((customer) => (
-                  <Card key={customer.id}>
-                    <Card.Header>
-                      {customer.firstname} {customer.lastname}
-                    </Card.Header>
-                    <Card.Body>
-                      <div className="row">
-                        <div className="col-md-4">{customer.phone}</div>{' '}
-                        <div className="col-md-6">{customer.email}</div>
+            <InfiniteScroll
+              dataLength={customers.length}
+              next={nextPageHandler}
+              hasMore={true}
+              loader={<h4>Loading...</h4>}
+            >
+              {filtered.length !== 0
+                ? filtered.map((fcustomer) => (
+                    <Card key={fcustomer.id}>
+                      <Card.Header>
+                        {fcustomer.firstname} {fcustomer.lastname}
+                      </Card.Header>
+                      <Card.Body>
+                        {fcustomer.phone} | {fcustomer.email}
                         <br></br>
                         <Button
                           variant="outline-primary"
+                          size="sm"
                           onClick={ViewCustHandler}
-                          value={customer.id}
+                          value={fcustomer.id}
                         >
                           View
                         </Button>
-                      </div>
-                    </Card.Body>
-                  </Card>
-                ))}
+                      </Card.Body>
+                    </Card>
+                  ))
+                : customers.map((customer) => (
+                    <Card key={customer.id}>
+                      <Card.Header>
+                        {customer.firstname} {customer.lastname}
+                      </Card.Header>
+                      <Card.Body>
+                        <div className="row">
+                          <div className="col-md-4">{customer.phone}</div>{' '}
+                          <div className="col-md-6">{customer.email}</div>
+                          <br></br>
+                          <Button
+                            variant="outline-primary"
+                            onClick={ViewCustHandler}
+                            value={customer.id}
+                          >
+                            View
+                          </Button>
+                        </div>
+                      </Card.Body>
+                    </Card>
+                  ))}
+            </InfiniteScroll>
           </div>
 
           {!viewCust ? (
@@ -139,7 +159,9 @@ function CustomerList({ customers, filtered, dispatch }) {
             <div className="col-md-6 pt-3">
               <Card>
                 <Card.Header>
-                  {viewingCust.firstname} {viewingCust.lastname}
+                  <Button variant="outline-primary" onClick={hideHandler} block>
+                    X
+                  </Button>
                 </Card.Header>
                 <Card.Body>
                   <Form>
@@ -288,22 +310,42 @@ function CustomerList({ customers, filtered, dispatch }) {
                         onChange={onChange}
                       />
                     </Form.Group>
-
                     <Button
                       variant="success"
                       type="submit"
                       onClick={editButtonHandler}
                       className="mr-3"
+                      block
                     >
                       Submit Changes
                     </Button>
-                    <Button
-                      variant="danger"
-                      type="submit"
-                      onClick={deleteHandler}
-                    >
-                      Delete
-                    </Button>
+                    <Accordion defaultActiveKey="1">
+                      <Card>
+                        <Card.Header>
+                          <Accordion.Toggle
+                            as={Button}
+                            variant="link"
+                            eventKey="0"
+                          >
+                            Delete
+                          </Accordion.Toggle>
+                        </Card.Header>
+                        <Accordion.Collapse eventKey="0">
+                          <Card.Body>
+                            Are you sure you want to delete{' '}
+                            {viewingCust.firstname} {viewingCust.lastname}?{' '}
+                            <br></br>{' '}
+                            <Button
+                              variant="danger"
+                              type="submit"
+                              onClick={deleteHandler}
+                            >
+                              Delete
+                            </Button>
+                          </Card.Body>
+                        </Accordion.Collapse>
+                      </Card>
+                    </Accordion>
                   </Form>
                 </Card.Body>
               </Card>
